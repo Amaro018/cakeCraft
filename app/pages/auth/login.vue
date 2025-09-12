@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authClient } from '~~/server/lib/auth-client';
+import { authClient } from '~~/shared/lib/auth-client';
 
 const email = ref('');
 const password = ref('');

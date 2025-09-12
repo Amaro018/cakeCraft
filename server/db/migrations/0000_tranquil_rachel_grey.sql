@@ -50,6 +50,23 @@ CREATE TABLE `verification` (
 	CONSTRAINT `verification_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `cakes` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`user_id` varchar(36) NOT NULL,
+	`cake_name` varchar(255) NOT NULL,
+	`cake_description` varchar(255),
+	`cake_price` varchar(255) NOT NULL,
+	`cake_category` varchar(255) NOT NULL,
+	`cake_flavor` varchar(255) NOT NULL,
+	`cake_size` varchar(255) NOT NULL,
+	`cake_topping` varchar(255) NOT NULL,
+	`cake_type` varchar(255) NOT NULL,
+	`good_for` varchar(255) NOT NULL,
+	`cake_image` varchar(255) NOT NULL,
+	`createdAt` timestamp DEFAULT (now()),
+	CONSTRAINT `cakes_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`name` varchar(255) NOT NULL,
