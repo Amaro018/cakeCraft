@@ -1,11 +1,12 @@
-// middleware/auth.ts
-import { authClient } from '../../server/lib/auth-client';
+// middleware/auth.global.ts
+export default defineNuxtRouteMiddleware(async () => {
+  const authStore = useAuthStore();
 
-export default defineNuxtRouteMiddleware(async (to) => {
-  // Call Better Auth client to fetch the session
-  const session = authClient.useSession();
+  if (authStore.loading) {
+    return
+  }
 
-  if (!session && to.path.startsWith('/dashboard')) {
+  if (!authStore.checkAuth()) {
     return navigateTo('/');
   }
 });

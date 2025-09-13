@@ -1,24 +1,11 @@
 <script setup lang="ts">
-import { authClient } from '../../../server/lib/auth-client';
-
-async function signInWithGoogle() {
-  try {
-    // Use provider-specific signIn
-    await authClient.signIn.social({
-      provider: 'google',
-      callbackURL: '/dashboard',
-    });
-  }
-  catch (err) {
-    console.error('Sign-in failed:', err);
-  }
-}
+const authStore = useAuthStore();
 </script>
 
 <template class="">
   <button
     class="btn btn-ghost  shadow outline"
-    @click="signInWithGoogle"
+    @click="authStore.signIn"
   >
     <Icon name="ion:logo-googleplus" size="2em" /> Sign in with Google
   </button>

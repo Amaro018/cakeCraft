@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import { authClient } from '../../../server/lib/auth-client';
-// import the auth client
-
-const session = authClient.useSession();
-
-async function signOut() {
-  await authClient.signOut();
-  await navigateTo('/auth/login');
-}
+const authStore = useAuthStore();
 </script>
 
 <template>
@@ -34,9 +26,9 @@ async function signOut() {
         <!-- Show logout if logged in -->
 
         <button
-          v-if="session?.data?.user"
+          v-if="authStore.user"
           class="btn btn-ghost"
-          @click="signOut"
+          @click="authStore.signOut"
         >
           Sign out
         </button>
