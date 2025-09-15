@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const auth = useAuthStore();
 useHead({
   title: 'Cake Craft Dashboard',
 });
@@ -12,7 +13,10 @@ definePageMeta({
 <template>
   <!-- Page Content -->
   <div class="w-full">
-    <main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-if="auth.loading">
+      loading
+    </div>
+    <main v-else class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Stat Cards -->
       <div class="stat bg-base-100 shadow-md rounded-xl p-4">
         <div class="stat-title">

@@ -19,14 +19,18 @@ const authStore = useAuthStore();
     </NuxtLink>
     <div class="">
       <ul class="menu menu-horizontal px-1">
-        <NuxtLink class="btn btn-ghost" to="/auth/login">
+        <NuxtLink
+          v-if="!authStore.user"
+          class="btn btn-ghost"
+          to="/auth/login"
+        >
           Start Selling
         </NuxtLink>
 
         <!-- Show logout if logged in -->
 
         <button
-          v-if="authStore.user"
+          v-else
           class="btn btn-ghost"
           @click="authStore.signOut"
         >

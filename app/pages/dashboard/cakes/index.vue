@@ -1,7 +1,26 @@
 <script setup lang="ts">
+import type { Cake } from '~~/server/lib/zod-schema';
+
+const { data: cakes, refresh } = await useFetch('/api/cakes');
+const auth = useAuthStore();
+const userId = computed(() => auth.user?.id || '');
+const cakeData = ref<Cake>({
+  user_id: userId.value,
+  cake_name: '',
+  cake_description: '',
+  cake_price: 0,
+  cake_category: '',
+  cake_flavor: '',
+  cake_size: '',
+  cake_topping: '',
+  cake_type: '',
+  good_for: '',
+  cake_image: null,
+});
+
 definePageMeta({
   layout: 'dashboard-layout',
-
+  middleware: ['auth'],
 });
 
 useHead({
@@ -11,6 +30,36 @@ useHead({
 const isOpen = ref(false);
 function openModal() {
   isOpen.value = true;
+}
+
+async function handleSubmit(cake: Cake) {
+  const payload = new FormData();
+
+  // ensure user_id is attached
+  payload.append('user_id', userId.value);
+
+  for (const [key, value] of Object.entries(cake)) {
+    if (value !== null && key !== 'cake_image') {
+      payload.append(key, value as any);
+    }
+  }
+
+  if (cake.cake_image instanceof File) {
+    payload.append('cake_image', cake.cake_image);
+  }
+
+  try {
+    const res = await $fetch('/api/cakes', {
+      method: 'POST',
+      body: payload,
+    });
+    console.warn('Cake created:', res);
+    await refresh(); // refresh list after create
+    isOpen.value = false; // close modal
+  }
+  catch (err) {
+    console.error('Upload failed:', err);
+  }
 }
 </script>
 
@@ -32,8 +81,37 @@ function openModal() {
       :open="isOpen"
     >
       <div class="modal-box w-11/12 max-w-5xl">
-        <CakesCakeForm @show-modal="isOpen = false" />
+        <CakesCakeForm
+          v-model:cake="cakeData"
+          @show-modal="isOpen = false"
+          @submit="handleSubmit"
+        />
       </div>
+      <!-- Cake grid -->
     </dialog>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <div v-for="cake in cakes?.data" :key="cake.id">
+        <div class="card card-compact bg-base-100 shadow-sm">
+          <figure>
+            <img
+              :src="`/uploads/${cake.cake_image}`"
+              alt="Cake image"
+              class="w-full h-48 object-cover rounded"
+            >
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title">
+              {{ cake.cake_name }}
+            </h2>
+            <p class="text-sm">
+              {{ cake.cake_description }}
+            </p>
+            <p class="text-sm font-bold">
+              {{ cake.cake_price }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

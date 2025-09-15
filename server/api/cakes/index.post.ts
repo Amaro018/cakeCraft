@@ -1,5 +1,6 @@
 import db from '~~/server/db';
 import { cakes } from '~~/server/db/schema/cake-schema';
+import { authClient } from '~~/server/lib/auth-client';
 import formidable from 'formidable';
 import { join } from 'node:path';
 
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
   let filePath: string | null = null;
   const file = files.cake_image?.[0];
   if (file) {
-    filePath = `/uploads/${file.newFilename}`;
+    filePath = `${file.newFilename}`;
   }
 
   // insert into DB (fields now are plain strings, not arrays)
@@ -55,8 +56,6 @@ export default defineEventHandler(async (event) => {
       cake_image: filePath ?? '',
     })
     .$returningId();
-
-  event.context.io.emit('newData', 'A new cake has been added.');
 
   return {
     success: true,

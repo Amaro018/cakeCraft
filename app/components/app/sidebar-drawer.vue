@@ -14,7 +14,6 @@ const authStore = useAuthStore();
         </h2>
       </div>
       <ul class="menu">
-        <li>Hello, {{ authStore.user?.name }}</li>
         <li>
           <NuxtLink to="/dashboard" class="active">
             Dashboard
