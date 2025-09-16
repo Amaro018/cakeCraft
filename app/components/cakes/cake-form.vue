@@ -1,41 +1,20 @@
 <script setup lang="ts">
-import { authClient } from '~~/shared/lib/auth-client';
+import type { Cake } from '~~/server/lib/zod-schema';
 
+const props = defineProps<{
+  cake: Cake;
+}>();
 const emit = defineEmits<{
   (e: 'showModal'): void;
+  (e: 'submit', formData: Cake): void;
 }>();
 const imageUrl = ref<string | null>(null);
 const imageFile = ref<File | null>(null);
 
-const session = await authClient.useSession();
+const localCake = ref(props.cake);
 
-// Define the type for your form data
-type CakeFormData = {
-  user_id: string;
-  cake_name: string;
-  cake_description: string;
-  cake_price: string;
-  cake_category: string;
-  cake_flavor: string;
-  cake_size: string;
-  cake_topping: string;
-  cake_type: string;
-  good_for: string;
-  cake_image: File | null; // ✅ File or null
-};
-
-const formData = ref<CakeFormData>({
-  user_id: session.value.data?.user.id ?? '',
-  cake_name: '',
-  cake_description: '',
-  cake_price: '',
-  cake_category: '',
-  cake_flavor: '',
-  cake_size: '',
-  cake_topping: '',
-  cake_type: '',
-  good_for: '',
-  cake_image: null,
+watch(() => props.cake, (newVal) => {
+  localCake.value = newVal;
 });
 
 function handleFileChange(event: Event) {
@@ -45,41 +24,16 @@ function handleFileChange(event: Event) {
   if (file) {
     imageFile.value = file;
     imageUrl.value = URL.createObjectURL(file); // generate a local preview URL
-    formData.value.cake_image = file;
+    localCake.value.cake_image = file;
   }
   else {
     imageUrl.value = null;
   }
 }
 
-async function handleSubmit() {
-  const payload = new FormData();
-
-  payload.append('cake_name', formData.value.cake_name);
-  payload.append('user_id', formData.value.user_id);
-  payload.append('cake_description', formData.value.cake_description);
-  payload.append('cake_price', formData.value.cake_price);
-  payload.append('cake_category', formData.value.cake_category);
-  payload.append('cake_flavor', formData.value.cake_flavor);
-  payload.append('cake_size', formData.value.cake_size);
-  payload.append('cake_topping', formData.value.cake_topping);
-  payload.append('cake_type', formData.value.cake_type);
-  payload.append('good_for', formData.value.good_for);
-
-  if (formData.value.cake_image) {
-    payload.append('cake_image', formData.value.cake_image); // this is a File
-  }
-  // console.warn(payload, 'the payload');
-  try {
-    const res = await $fetch('/api/cakes', {
-      method: 'POST',
-      body: payload,
-    });
-    console.warn('Cake created:', res);
-  }
-  catch (err) {
-    console.error('Upload failed:', err);
-  }
+function handleSubmit() {
+  // Ensure user_id is set before emitting
+  emit('submit', { ...localCake.value });
 }
 </script>
 
@@ -92,7 +46,7 @@ async function handleSubmit() {
       <form @submit.prevent="handleSubmit">
         <div class="flex flex-col gap-4 w-full justify-center">
           <input
-            v-model="formData.cake_name"
+            v-model="localCake.cake_name"
             type="text"
             placeholder="Cake Name"
             class="input w-full"
@@ -103,7 +57,7 @@ async function handleSubmit() {
               cake description
             </legend>
             <textarea
-              v-model="formData.cake_description"
+              v-model="localCake.cake_description"
               class="textarea h-24 w-full"
               placeholder="Bio"
             />
@@ -114,19 +68,19 @@ async function handleSubmit() {
 
           <div class="flex flex-row gap-4">
             <input
-              v-model="formData.cake_price"
+              v-model="localCake.cake_price"
               type="number"
               placeholder="Price"
               class="input"
             >
             <input
-              v-model="formData.cake_category"
+              v-model="localCake.cake_category"
               type="text"
               placeholder="Category"
               class="input"
             >
             <input
-              v-model="formData.cake_flavor"
+              v-model="localCake.cake_flavor"
               type="text"
               placeholder="Flavor"
               class="input"
@@ -134,19 +88,19 @@ async function handleSubmit() {
           </div>
           <div class="flex flex-row gap-4">
             <input
-              v-model="formData.cake_size"
+              v-model="localCake.cake_size"
               type="text"
               placeholder="Size"
               class="input"
             >
             <input
-              v-model="formData.cake_topping"
+              v-model="localCake.cake_topping"
               type="text"
               placeholder="Topping"
               class="input"
             >
             <input
-              v-model="formData.cake_type"
+              v-model="localCake.cake_type"
               type="text"
               placeholder="Type"
               class="input"
@@ -154,7 +108,7 @@ async function handleSubmit() {
           </div>
           <div class="flex flex-row gap-4">
             <input
-              v-model="formData.good_for"
+              v-model="localCake.good_for"
               type="text"
               placeholder="Good For"
               class="input"

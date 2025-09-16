@@ -24,7 +24,9 @@ const authStore = useAuthStore();
       </label>
     </div>
     <div class="flex-1">
-      <a class="text-xl font-bold"> sample</a>
+      <a class="text-xl font-bold">           <ClientOnly>
+        Hello, {{ authStore.user?.name }}
+      </ClientOnly></a>
     </div>
     <div class="flex-none">
       <button class="btn btn-ghost btn-circle">
