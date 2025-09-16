@@ -6,6 +6,7 @@ const userId = computed(() => auth.user?.id || '');
 const { data: cakes, refresh } = await useFetch('/api/cakes');
 const userCakes = computed(() => cakes.value || []);
 console.warn('Cake data:', userCakes.value);
+
 const cakeData = ref<Cake>({
   user_id: userId.value,
   cake_name: '',

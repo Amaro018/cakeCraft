@@ -5,3 +5,12 @@
     dark --prefersdark,
     cupcake --default;
 }
+/* assets/css/tailwind.css */
+@layer components {
+  .btn-gradient {
+    @apply text-white font-semibold rounded-lg 
+           bg-gradient-to-r from-amber-500 to-orange-500
+           hover:from-amber-600 hover:to-orange-600
+           transition-colors duration-200;
+  }
+}

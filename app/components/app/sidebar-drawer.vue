@@ -15,18 +15,41 @@ const authStore = useAuthStore();
       </div>
       <ul class="menu">
         <li>
-          <NuxtLink to="/dashboard" class="active">
-            Dashboard
-          </NuxtLink>
+          <div class="flex flex-row items-center gap-2">
+            <Icon name="lucide:layout-dashboard" size="1em" />
+            <NuxtLink to="/dashboard" class="active">
+              Dashboard
+            </NuxtLink>
+          </div>
         </li>
         <li>
-          <NuxtLink to="/dashboard/cakes">
-            Cakes
-          </NuxtLink>
+          <div class="flex flex-row items-center gap-2">
+            <Icon name="lucide:cake" size="1em" />
+            <NuxtLink to="/dashboard/cakes">
+              Cakes
+            </NuxtLink>
+          </div>
+        </li>
+        <li>
+          <div class="flex flex-row items-center gap-2">
+            <Icon name="lucide:chef-hat" size="1em" />
+            <NuxtLink to="/dashboard/baker">
+              Bakers Info
+            </NuxtLink>
+          </div>
         </li>
         <li>
           <button @click="authStore.signOut">
-            Logout
+            <div class="flex flex-row items-center gap-2">
+              <Icon
+                name="lucide:log-out"
+                size="1em"
+                class="transform rotate-180"
+              />
+              <p>
+                Logout
+              </p>
+            </div>
           </button>
         </li>
       </ul>

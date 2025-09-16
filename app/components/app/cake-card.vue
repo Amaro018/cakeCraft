@@ -13,7 +13,7 @@ defineProps<{ cakes: any }>();
             class="w-full h-48 object-cover"
           >
           <div>
-            <span class="badge bg-primary font-bold absolute top-2 right-2">
+            <span class="btn-gradient font-bold absolute top-2 right-2 text-xs px-2">
               {{ cake.cake_category }}
             </span>
           </div>
@@ -49,8 +49,8 @@ defineProps<{ cakes: any }>();
               </p>
             </div>
             <div>
-              <button class="btn btn-primary">
-                Edit
+              <button class="btn-gradient cursor-pointer px-4 py-2">
+                ask the baker
               </button>
             </div>
           </div>

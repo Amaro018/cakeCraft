@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { data: cakes } = await useFetch('/api/cakes');
+console.warn('Cake data:', cakes.value);
+</script>
+
 <template>
   <div class="hero max-w-screen p-10  flex flex-col ">
     <div class="hero-content text-center max-w-md">
@@ -24,7 +29,10 @@
       </div>
     </div>
     <section class="p-10 min-w-full">
-      <AppCards />
+      <AppCards :cakes="cakes" />
     </section>
+    <div>
+      <AppCakeCard :cakes="cakes" />
+    </div>
   </div>
 </template>
