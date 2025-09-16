@@ -23,6 +23,6 @@ logs
 .env.*
 !.env.example
 
-./db/migrations/*
+/server/db/migrations/*
 
 public/*
