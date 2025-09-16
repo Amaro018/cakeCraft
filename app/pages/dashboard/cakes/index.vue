@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Cake } from '~~/server/lib/zod-schema';
 
-const { data: cakes, refresh } = await useFetch('/api/cakes');
 const auth = useAuthStore();
 const userId = computed(() => auth.user?.id || '');
+const { data: cakes, refresh } = await useFetch('/api/cakes');
+const userCakes = computed(() => cakes.value || []);
+console.warn('Cake data:', userCakes.value);
 const cakeData = ref<Cake>({
   user_id: userId.value,
   cake_name: '',
@@ -89,29 +91,8 @@ async function handleSubmit(cake: Cake) {
       </div>
       <!-- Cake grid -->
     </dialog>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-      <div v-for="cake in cakes?.data" :key="cake.id">
-        <div class="card card-compact bg-base-100 shadow-sm">
-          <figure>
-            <img
-              :src="`/uploads/${cake.cake_image}`"
-              alt="Cake image"
-              class="w-full h-48 object-cover rounded"
-            >
-          </figure>
-          <div class="card-body">
-            <h2 class="card-title">
-              {{ cake.cake_name }}
-            </h2>
-            <p class="text-sm">
-              {{ cake.cake_description }}
-            </p>
-            <p class="text-sm font-bold">
-              {{ cake.cake_price }}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div>
+      <CakesCakeCard :cakes="userCakes" />
     </div>
   </div>
 </template>
