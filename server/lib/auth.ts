@@ -24,4 +24,5 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  allowedOrigin: env.BETTER_AUTH_URL,
 });

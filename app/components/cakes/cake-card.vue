@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{ cakes: any }>();
+defineEmits(['edit', 'delete']);
 </script>
 
 <template>
@@ -22,7 +23,7 @@ defineProps<{ cakes: any }>();
           <h2 class="card-title">
             {{ cake.cake_name }}
           </h2>
-          <p class="text-sm">
+          <p class="text-sm line-clamp-2">
             {{ cake.cake_description }}
           </p>
           <div class="flex flex-row justify-between">
@@ -49,9 +50,15 @@ defineProps<{ cakes: any }>();
               </p>
             </div>
             <div>
-              <button class="btn btn-primary">
+              <button class="btn-gradient px-4 py-2 flex flex-row items-center gap-2 cursor-pointer" @click="$emit('edit', cake)">
                 Edit
               </button>
+              <!-- <button
+                class="btn px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg"
+                @click="$emit('delete', cake)"
+              >
+                Delete
+              </button> -->
             </div>
           </div>
         </div>

@@ -41,33 +41,35 @@ async function login() {
         <div class="card-body">
           <AppAuthButton />
           <!-- login fields -->
-          <fieldset class="fieldset">
-            <label class="label">Email</label>
-            <input
-              v-model="email"
-              type="email"
-              class="input w-full"
-              placeholder="Email"
-            >
-            <label class="label">Password</label>
-            <input
-              v-model="password"
-              type="password"
-              class="input w-full"
-              placeholder="Password"
-            >
-            <div>
-              <a class="link link-hover">Forgot password?</a>
-            </div>
-            <div class="flex flex-row w-full gap-2">
-              <button class="flex-1 btn btn-neutral mt-4" @click="login">
-                Login
-              </button>
-              <NuxtLink to="/auth/register" class="flex-1 btn btn-info mt-4">
-                Register
-              </NuxtLink>
-            </div>
-          </fieldset>
+          <form @submit.prevent="login">
+            <fieldset class="fieldset">
+              <label class="label">Email</label>
+              <input
+                v-model="email"
+                type="email"
+                class="input w-full"
+                placeholder="Email"
+              >
+              <label class="label">Password</label>
+              <input
+                v-model="password"
+                type="password"
+                class="input w-full"
+                placeholder="Password"
+              >
+              <div>
+                <a class="link link-hover">Forgot password?</a>
+              </div>
+              <div class="flex flex-row w-full gap-2">
+                <button class="flex-1 btn btn-neutral mt-4" type="submit">
+                  Login
+                </button>
+                <NuxtLink to="/auth/register" class="flex-1 btn btn-info mt-4">
+                  Register
+                </NuxtLink>
+              </div>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import type { Cake } from '~~/server/lib/zod-schema';
 
-const auth = useAuthStore();
-const userId = computed(() => auth.user?.id || '');
 const { data: cakes, refresh } = await useFetch('/api/cakes');
 const userCakes = computed(() => cakes.value || []);
-console.warn('Cake data:', userCakes.value);
+const cakeFormRef = ref();
+const editingCake = ref();
 
 const cakeData = ref<Cake>({
-  user_id: userId.value,
   cake_name: '',
   cake_description: '',
   cake_price: 0,
@@ -31,15 +29,20 @@ useHead({
 });
 
 const isOpen = ref(false);
-function openModal() {
+
+function openCreateModal() {
+  editingCake.value = null; // ✅ reset
+  isOpen.value = true;
+}
+
+function openEditModal(cake: any) {
+  editingCake.value = { ...cake }; // clone cake so form won’t mutate directly
+  console.warn('Editing cake:', editingCake.value);
   isOpen.value = true;
 }
 
 async function handleSubmit(cake: Cake) {
   const payload = new FormData();
-
-  // ensure user_id is attached
-  payload.append('user_id', userId.value);
 
   for (const [key, value] of Object.entries(cake)) {
     if (value !== null && key !== 'cake_image') {
@@ -47,18 +50,47 @@ async function handleSubmit(cake: Cake) {
     }
   }
 
+  // only append if a new file was uploaded
   if (cake.cake_image instanceof File) {
     payload.append('cake_image', cake.cake_image);
   }
 
   try {
-    const res = await $fetch('/api/cakes', {
-      method: 'POST',
-      body: payload,
-    });
-    console.warn('Cake created:', res);
-    await refresh(); // refresh list after create
-    isOpen.value = false; // close modal
+    if (editingCake.value?.id) {
+      // 🟢 EDIT mode
+      const res = await $fetch(`/api/cakes/${editingCake.value.id}`, {
+        method: 'PUT',
+        body: payload,
+      });
+      console.warn('Cake updated:', res);
+    }
+    else {
+      // 🟢 CREATE mode
+      const res = await $fetch('/api/cakes', {
+        method: 'POST',
+        body: payload,
+      });
+      console.warn('Cake created:', res);
+    }
+
+    await refresh(); // refresh list after create/update
+
+    // ✅ reset form + close modal
+    cakeFormRef.value?.resetForm();
+    cakeData.value = {
+      cake_name: '',
+      cake_description: '',
+      cake_price: 0,
+      cake_category: '',
+      cake_flavor: '',
+      cake_size: '',
+      cake_topping: '',
+      cake_type: '',
+      good_for: '',
+      cake_image: null,
+    };
+    isOpen.value = false;
+    editingCake.value = null;
   }
   catch (err) {
     console.error('Upload failed:', err);
@@ -72,7 +104,7 @@ async function handleSubmit(cake: Cake) {
       <p class="text-2xl font-bold">
         All Cakes
       </p>
-      <button class="btn btn-primary" @click="openModal">
+      <button class="btn-gradient px-4 py-2 flex flex-row items-center gap-2 cursor-pointer" @click="openCreateModal">
         <Icon name="lucide:circle-plus" size="24" />
         Add Cake
       </button>
@@ -85,15 +117,34 @@ async function handleSubmit(cake: Cake) {
     >
       <div class="modal-box w-11/12 max-w-5xl">
         <CakesCakeForm
-          v-model:cake="cakeData"
-          @show-modal="isOpen = false"
+          ref="cakeFormRef"
+
+          :cake="editingCake || {
+            cake_name: '',
+            cake_description: '',
+            cake_price: 0,
+            cake_category: '',
+            cake_flavor: '',
+            cake_size: '',
+            cake_topping: '',
+            cake_type: '',
+            good_for: '',
+            cake_image: null,
+          }"
+          @show-modal="() => {
+            isOpen = false;
+            cakeFormRef?.resetForm(); // ✅ clears image + localCake
+          }"
           @submit="handleSubmit"
         />
       </div>
       <!-- Cake grid -->
     </dialog>
     <div>
-      <CakesCakeCard :cakes="userCakes" />
+      <CakesCakeCard
+        :cakes="userCakes"
+        @edit="openEditModal"
+      />
     </div>
   </div>
 </template>

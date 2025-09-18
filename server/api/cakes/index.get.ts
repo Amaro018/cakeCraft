@@ -21,6 +21,7 @@
 
 // server/api/cakes/index.ts
 import db from '~~/server/db';
+import { baker } from '~~/server/db/schema/baker-schema';
 import { cakes } from '~~/server/db/schema/cake-schema';
 import { auth } from '~~/server/lib/auth'; // your better-auth config
 import { eq } from 'drizzle-orm';
@@ -32,7 +33,8 @@ export default defineEventHandler(async (event) => {
   if (!session?.user) {
     result = await db
       .select()
-      .from(cakes);
+      .from(cakes)
+      .leftJoin(baker, eq(cakes.user_id, baker.user_id));
   }
   else {
     result = await db

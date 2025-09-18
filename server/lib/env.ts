@@ -8,6 +8,7 @@ const EnvSchema = z.object({
   NUXT_SESSION_PASSWORD: z.string().max(32),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  BETTER_AUTH_URL: z.string(),
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;

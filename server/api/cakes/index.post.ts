@@ -1,10 +1,17 @@
 import db from '~~/server/db';
 import { cakes } from '~~/server/db/schema/cake-schema';
-import { authClient } from '~~/server/lib/auth-client';
+import { auth } from '~~/server/lib/auth';
 import formidable from 'formidable';
 import { join } from 'node:path';
 
 export default defineEventHandler(async (event) => {
+  const session = await auth.api.getSession(event);
+  if (!session?.user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+    });
+  }
   const form = formidable({
     multiples: false,
     uploadDir: join(process.cwd(), 'public/uploads'),
@@ -22,7 +29,6 @@ export default defineEventHandler(async (event) => {
 
   // destructure & normalize
   const cake_name = getField(fields.cake_name)!;
-  const user_id = getField(fields.user_id)!;
   const cake_description = getField(fields.cake_description);
   const cake_price = getField(fields.cake_price)!;
   const cake_category = getField(fields.cake_category)!;
@@ -43,7 +49,7 @@ export default defineEventHandler(async (event) => {
   const [createdCake] = await db
     .insert(cakes)
     .values({
-      user_id,
+      user_id: session.user.id,
       cake_name,
       cake_description: cake_description ?? '',
       cake_price,

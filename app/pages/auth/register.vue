@@ -72,7 +72,7 @@ async function register() {
 
         <button
           type="submit"
-          class="btn btn-primary w-full"
+          class="btn-gradient px-4 py-2 cursor-pointer w-full"
           :disabled="isLoading"
         >
           <span v-if="isLoading" class="loading loading-spinner" />
@@ -85,7 +85,7 @@ async function register() {
       </form>
 
       <div class="text-center mt-4">
-        <NuxtLink to="/auth/login" class="link link-primary">
+        <NuxtLink to="/auth/login" class="link link-hover">
           Already have an account? Sign in
         </NuxtLink>
       </div>

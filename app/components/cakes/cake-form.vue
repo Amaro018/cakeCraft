@@ -8,8 +8,12 @@ const emit = defineEmits<{
   (e: 'showModal'): void;
   (e: 'submit', formData: Cake): void;
 }>();
+
+defineExpose({ resetForm });
+
 const imageUrl = ref<string | null>(null);
 const imageFile = ref<File | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const localCake = ref(props.cake);
 
@@ -31,10 +35,44 @@ function handleFileChange(event: Event) {
   }
 }
 
+function resetForm() {
+  imageUrl.value = null;
+  imageFile.value = null;
+  localCake.value = {
+    cake_name: '',
+    cake_description: '',
+    cake_price: 0,
+    cake_category: '',
+    cake_flavor: '',
+    cake_size: '',
+    cake_topping: '',
+    cake_type: '',
+    good_for: '',
+    cake_image: null,
+  } as Cake;
+
+  // 👇 reset actual input field text
+  if (fileInputRef.value) {
+    fileInputRef.value.value = '';
+  }
+}
+
 function handleSubmit() {
   // Ensure user_id is set before emitting
   emit('submit', { ...localCake.value });
 }
+
+watch(() => props.cake, (newVal) => {
+  localCake.value = { ...newVal };
+
+  // if editing existing cake with image
+  if (newVal.cake_image && typeof newVal.cake_image === 'string') {
+    imageUrl.value = `/uploads/${newVal.cake_image}`;
+  }
+  else {
+    imageUrl.value = null;
+  }
+});
 </script>
 
 <template>
@@ -50,6 +88,7 @@ function handleSubmit() {
             type="text"
             placeholder="Cake Name"
             class="input w-full"
+            required
           >
 
           <fieldset class="fieldset">
@@ -59,7 +98,8 @@ function handleSubmit() {
             <textarea
               v-model="localCake.cake_description"
               class="textarea h-24 w-full"
-              placeholder="Bio"
+              placeholder="Cake Description (Optional) max 250 characters"
+              maxlength="250"
             />
             <div class="label">
               Optional
@@ -72,12 +112,14 @@ function handleSubmit() {
               type="number"
               placeholder="Price"
               class="input"
+              required
             >
             <input
               v-model="localCake.cake_category"
               type="text"
               placeholder="Category"
               class="input"
+              required
             >
             <input
               v-model="localCake.cake_flavor"
@@ -115,9 +157,11 @@ function handleSubmit() {
             >
 
             <input
+              ref="fileInputRef"
               type="file"
               accept="image/*"
               class="file-input file-input-primary w-full"
+              required
               @change="handleFileChange"
             >
           </div>
@@ -133,7 +177,11 @@ function handleSubmit() {
         </div>
         <!-- if there is a button, it will close the modal -->
         <div class="flex flex-row justify-end gap-4 my-4">
-          <button class="btn" @click="emit('showModal')">
+          <button
+            class="btn"
+            type="button"
+            @click="emit('showModal')"
+          >
             Close
           </button>
           <button class="btn btn-primary" type="submit">

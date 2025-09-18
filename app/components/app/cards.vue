@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ cakes: any }>();
+defineProps<{ cakes: any; bakers: any }>();
 </script>
 
 <template>
@@ -23,7 +23,7 @@ defineProps<{ cakes: any }>();
       <div class="card-body flex justify-center flex-col items-center">
         <Icon name="simple-icons:codechef" size="4em" />
         <p class="text-2xl font-bold">
-          50+
+          {{ bakers.data.length }}
         </p>
         <p class="">
           Talented Bakers

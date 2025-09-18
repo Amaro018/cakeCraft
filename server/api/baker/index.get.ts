@@ -7,10 +7,9 @@ export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession(event);
   let result;
   if (!session?.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    });
+    result = await db
+      .select()
+      .from(baker);
   }
   else {
     result = await db

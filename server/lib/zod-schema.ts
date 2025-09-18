@@ -6,8 +6,6 @@ const loginSchema = z.object({
 });
 
 const cakeSchema = z.object({
-
-  user_id: z.string(),
   cake_name: z.string().min(3, { message: 'Name must be at least 3 characters long.' }),
   cake_description: z.string(),
   cake_price: z.number(),

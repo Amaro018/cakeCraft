@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
+const { data: baker } = await useFetch('/api/baker');
+const bakerId = computed(() => baker.value?.data?.[0]?.id || null);
 </script>
 
 <template>
@@ -23,11 +25,24 @@ const authStore = useAuthStore();
           </div>
         </li>
         <li>
-          <div class="flex flex-row items-center gap-2">
+          <div v-if="bakerId" class="flex flex-row items-center gap-2">
             <Icon name="lucide:cake" size="1em" />
             <NuxtLink to="/dashboard/cakes">
               Cakes
             </NuxtLink>
+          </div>
+          <div
+            v-else
+            class="flex flex-row items-center gap-2 tooltip tooltip-info tooltip-top"
+            data-tip="Add a baker info first"
+          >
+            <span
+
+              class="opacity-50 cursor-not-allowed  "
+            >
+              <Icon name="lucide:cake" size="1em" />
+              Cakes
+            </span>
           </div>
         </li>
         <li>

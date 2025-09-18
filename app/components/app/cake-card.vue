@@ -8,50 +8,66 @@ defineProps<{ cakes: any }>();
       <div class="card card-compact shadow-sm">
         <figure class="relative">
           <img
-            :src="`/uploads/${cake.cake_image}`"
+            :src="`/uploads/${cake.cakes.cake_image}`"
             alt="Cake image"
             class="w-full h-48 object-cover"
           >
           <div>
             <span class="btn-gradient font-bold absolute top-2 right-2 text-xs px-2">
-              {{ cake.cake_category }}
+              {{ cake.cakes.cake_category }}
             </span>
           </div>
         </figure>
         <div class="card-body">
-          <h2 class="card-title">
-            {{ cake.cake_name }}
+          <h2 class="card-title ">
+            {{ cake.baker?.baker_name || 'No Baker' }}
           </h2>
+          <p class="text-lg capitalize">
+            {{ cake.cakes.cake_name }}
+          </p>
           <p class="text-sm">
-            {{ cake.cake_description }}
+            {{ cake.cakes.cake_description }}
           </p>
           <div class="flex flex-row justify-between">
             <p>
-              Flavor : {{ cake.cake_flavor }}
+              Flavor : {{ cake.cakes.cake_flavor }}
             </p>
             <p>
-              Size : {{ cake.cake_size }}
+              Size : {{ cake.cakes.cake_size }}
             </p>
             <p>
-              Topping : {{ cake.cake_topping }}
+              Topping : {{ cake.cakes.cake_topping }}
             </p>
           </div>
           <div class="flex flex-row items-center gap-2">
             <Icon name="lucide:users" size="1em" />
             <p>
-              Serves : {{ cake.good_for }}
+              Serves : {{ cake.cakes.good_for }}
+            </p>
+          </div>
+          <div class="flex flex-row items-center gap-2">
+            <Icon name="lucide:map-pin" size="1em" />
+            <p>
+              Address : {{ cake.baker?.baker_address || 'No Address' }}
             </p>
           </div>
           <div class="flex flex-row justify-between">
             <div class="flex flex-row items-center gap-2">
               <p class="text-2xl font-bold">
-                {{ cake.cake_price }} Pesos
+                {{ cake.cakes.cake_price }} Pesos
               </p>
             </div>
             <div>
-              <button class="btn-gradient cursor-pointer px-4 py-2">
-                ask the baker
-              </button>
+              <a
+                v-if="cake.baker?.baker_messenger_link"
+                :href="cake.baker.baker_messenger_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-gradient text-white px-4 py-2 flex flex-row items-center gap-2 cursor-pointer"
+              >
+                <Icon name="lucide:message-circle" size="1em" />
+                Message Baker
+              </a>
             </div>
           </div>
         </div>
