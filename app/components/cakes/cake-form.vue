@@ -64,9 +64,9 @@ function handleSubmit() {
 
 watch(() => props.cake, (newVal) => {
   localCake.value = { ...newVal };
-
+  console.warn('Editing cake:', localCake.value);
   // if editing existing cake with image
-  if (newVal.cake_image && typeof newVal.cake_image === 'string') {
+  if (newVal.cake_image) {
     imageUrl.value = `/uploads/${newVal.cake_image}`;
   }
   else {
@@ -107,26 +107,36 @@ watch(() => props.cake, (newVal) => {
           </fieldset>
 
           <div class="flex flex-row gap-4">
-            <input
-              v-model="localCake.cake_price"
-              type="number"
-              placeholder="Price"
-              class="input"
-              required
-            >
-            <input
-              v-model="localCake.cake_category"
-              type="text"
-              placeholder="Category"
-              class="input"
-              required
-            >
-            <input
-              v-model="localCake.cake_flavor"
-              type="text"
-              placeholder="Flavor"
-              class="input"
-            >
+            <fieldset class="fieldset w-full">
+              <legend>Cake Price</legend>
+              <input
+                v-model="localCake.cake_price"
+                type="number"
+                placeholder="Price"
+                class="input"
+                min="1"
+                required
+              >
+            </fieldset>
+            <fieldset class="fieldset w-full">
+              <legend>Category</legend>
+              <input
+                v-model="localCake.cake_category"
+                type="text"
+                placeholder="Birthday, Wedding, Anniversary"
+                class="input"
+                required
+              >
+            </fieldset>
+            <fieldset class="fieldset w-full">
+              <legend>Cake Flavor</legend>
+              <input
+                v-model="localCake.cake_flavor"
+                type="text"
+                placeholder="Chocolate, Vanilla, Strawberry"
+                class="input"
+              >
+            </fieldset>
           </div>
           <div class="flex flex-row gap-4">
             <input
@@ -144,7 +154,7 @@ watch(() => props.cake, (newVal) => {
             <input
               v-model="localCake.cake_type"
               type="text"
-              placeholder="Type"
+              placeholder="Type : Cake, Cupcake, Muffin, chiffon"
               class="input"
             >
           </div>
@@ -161,7 +171,7 @@ watch(() => props.cake, (newVal) => {
               type="file"
               accept="image/*"
               class="file-input file-input-primary w-full"
-              required
+
               @change="handleFileChange"
             >
           </div>

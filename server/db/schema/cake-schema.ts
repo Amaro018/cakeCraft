@@ -1,5 +1,6 @@
 import { int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 const cakes = mysqlTable('cakes', {
   id: int('id').autoincrement().primaryKey(),
@@ -13,11 +14,12 @@ const cakes = mysqlTable('cakes', {
   cake_topping: varchar('cake_topping', { length: 255 }).notNull(),
   cake_type: varchar('cake_type', { length: 255 }).notNull(),
   good_for: varchar('good_for', { length: 255 }).notNull(),
-  cake_image: varchar('cake_image', { length: 255 }).notNull(), // store URL/path
+  cake_image: varchar('cake_image', { length: 255 }).notNull(),
   createdAt: timestamp('createdAt').defaultNow(),
-
+  updatedAt: timestamp('updatedAt').onUpdateNow().defaultNow(), // 👈 new
 });
 
+// ✅ Insert schema
 const cakesInsertSchema = createInsertSchema(cakes, {
   cake_name: schema => schema.min(3),
   cake_description: schema => schema.min(3),
@@ -32,6 +34,10 @@ const cakesInsertSchema = createInsertSchema(cakes, {
 }).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
-export { cakes, cakesInsertSchema };
+// ✅ Update schema (all optional)
+const cakesUpdateSchema = cakesInsertSchema.partial();
+
+export { cakes, cakesInsertSchema, cakesUpdateSchema };

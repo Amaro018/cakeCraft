@@ -14,7 +14,7 @@ defineEmits(['edit', 'delete']);
             class="w-full h-48 object-cover"
           >
           <div>
-            <span class="badge bg-primary font-bold absolute top-2 right-2">
+            <span class="btn-gradient px-4 text-xs absolute top-2 right-2">
               {{ cake.cake_category }}
             </span>
           </div>
