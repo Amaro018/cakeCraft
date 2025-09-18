@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { Cake } from '~~/server/lib/zod-schema';
+import type { FetchError } from 'ofetch';
+
+const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 const { data: cakes, refresh } = await useFetch('/api/cakes');
 const userCakes = computed(() => cakes.value || []);
@@ -62,7 +65,7 @@ async function handleSubmit(cake: Cake) {
         method: 'PUT',
         body: payload,
       });
-      console.warn('Cake updated:', res);
+      showMessage(res.message, false);
     }
     else {
       // 🟢 CREATE mode
@@ -70,7 +73,7 @@ async function handleSubmit(cake: Cake) {
         method: 'POST',
         body: payload,
       });
-      console.warn('Cake created:', res);
+      showMessage(res.message, false);
     }
 
     await refresh(); // refresh list after create/update
@@ -92,8 +95,9 @@ async function handleSubmit(cake: Cake) {
     isOpen.value = false;
     editingCake.value = null;
   }
-  catch (err) {
-    console.error('Upload failed:', err);
+  catch (e) {
+    const error = e as FetchError;
+    showMessage(error.data.message || 'An unexpected error occurred.', true);
   }
 }
 </script>
@@ -146,5 +150,10 @@ async function handleSubmit(cake: Cake) {
         @edit="openEditModal"
       />
     </div>
+    <ToastNotif
+      :is-message="isMessage"
+      :is-error="isError"
+      :response-message="responseMessage"
+    />
   </div>
 </template>

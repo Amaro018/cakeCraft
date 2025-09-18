@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch';
+
 import { authClient } from '~~/shared/lib/auth-client';
+
+const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 const email = ref('');
 const password = ref('');
@@ -12,15 +16,17 @@ async function login() {
     });
 
     if (res.error) {
-      console.error('Sign-in failed:', res.error.message);
+      showMessage('Sign-in failed:', true);
       return;
     }
 
     // Success: redirect user
+    showMessage('Successfully logged in', false);
     await navigateTo('/dashboard');
   }
   catch (err: any) {
-    console.error('Sign-in failed:', err.message || err);
+    const error = err as FetchError;
+    showMessage(error.data.message || 'An unexpected error occurred.', true);
   }
 }
 </script>
@@ -73,5 +79,11 @@ async function login() {
         </div>
       </div>
     </div>
+
+    <ToastNotif
+      :is-message="isMessage"
+      :is-error="isError"
+      :response-message="responseMessage"
+    />
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { data: cakes } = await useFetch('/api/cakes');
 const { data: bakers } = await useFetch('/api/baker');
+const { data: userCount } = await useFetch('/api/users');
 console.warn('Cake data:', cakes.value);
 </script>
 
@@ -30,7 +31,11 @@ console.warn('Cake data:', cakes.value);
       </div>
     </div>
     <section class="p-10 min-w-full">
-      <AppCards :cakes="cakes" :bakers="bakers" />
+      <AppCards
+        :cakes="cakes"
+        :bakers="bakers"
+        :user-count="userCount"
+      />
     </section>
     <div>
       <AppCakeCard :cakes="cakes" />

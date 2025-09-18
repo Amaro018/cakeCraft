@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ cakes: any; bakers: any }>();
+defineProps<{ cakes: any; bakers: any; userCount: any }>();
 </script>
 
 <template>
@@ -34,12 +34,12 @@ defineProps<{ cakes: any; bakers: any }>();
       class="card card-dash w-96 backdrop-blur-sm rounded-2xl p-6 text-center border border-amber-100"
     >
       <div class="card-body flex justify-center flex-col items-center">
-        <Icon name="material-symbols-light:kid-star" size="4em" />
+        <Icon name="lucide:users-round" size="4em" />
         <p class="text-2xl font-bold">
-          4.9
+          {{ userCount.data }}
         </p>
         <p class="">
-          Average Rating
+          Registered Users
         </p>
       </div>
     </div>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch';
+
 const auth = useAuthStore();
+const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 type BakerForm = {
   user_id: string | number;
@@ -38,12 +41,13 @@ async function handleSubmit() {
       body: formData.value,
     });
 
-    console.warn('Baker saved:', res);
+    showMessage(res.message, false);
     isEditing.value = false;
     await refresh(); // re-fetch latest data
   }
-  catch (err) {
-    console.error('Save failed:', err);
+  catch (e) {
+    const error = e as FetchError;
+    showMessage(error.data.message || 'An unexpected error occurred.', true);
   }
 }
 </script>
@@ -181,5 +185,10 @@ async function handleSubmit() {
         </button>
       </div>
     </form>
+    <ToastNotif
+      :is-message="isMessage"
+      :is-error="isError"
+      :response-message="responseMessage"
+    />
   </div>
 </template>

@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch';
+
 import { authClient } from '~~/shared/lib/auth-client';
 import { ref } from 'vue';
+
+const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 useHead({ title: 'Register - Cake Craft' });
 
@@ -25,12 +29,13 @@ async function register() {
       errorMessage.value = res.error.message || 'Something went wrong';
       return;
     }
-
+    showMessage('Successfully signed up', false);
     // redirect after successful signup
     await navigateTo('/dashboard');
   }
   catch (err: any) {
-    errorMessage.value = err.message || 'Something went wrong';
+    const error = err as FetchError;
+    showMessage(error.data.message || 'An unexpected error occurred.', true);
   }
   finally {
     isLoading.value = false;
@@ -90,5 +95,10 @@ async function register() {
         </NuxtLink>
       </div>
     </div>
+    <ToastNotif
+      :is-message="isMessage"
+      :is-error="isError"
+      :response-message="responseMessage"
+    />
   </div>
 </template>
