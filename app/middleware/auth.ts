@@ -1,12 +1,7 @@
 // middleware/auth.global.ts
 export default defineNuxtRouteMiddleware(async () => {
-  const authStore = useAuthStore();
-
-  if (authStore.loading) {
-    return;
-  }
-
-  if (!authStore.checkAuth()) {
+  const auth = useAuthStore();
+  if (!auth.isLoggedIn && !auth.loading && !auth.user) {
     return navigateTo('/auth/login');
   }
 });

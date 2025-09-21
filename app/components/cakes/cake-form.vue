@@ -64,7 +64,6 @@ function handleSubmit() {
 
 watch(() => props.cake, (newVal) => {
   localCake.value = { ...newVal };
-  console.warn('Editing cake:', localCake.value);
   // if editing existing cake with image
   if (newVal.cake_image) {
     imageUrl.value = `/uploads/${newVal.cake_image}`;

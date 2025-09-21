@@ -26,3 +26,5 @@ logs
 /server/db/migrations/*
 
 public/*
+
+docker-compose.yml

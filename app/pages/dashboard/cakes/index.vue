@@ -2,6 +2,8 @@
 import type { Cake } from '~~/server/lib/zod-schema';
 import type { FetchError } from 'ofetch';
 
+const auth = useAuthStore();
+
 const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 const { data: cakes, refresh } = await useFetch('/api/cakes');
@@ -40,7 +42,6 @@ function openCreateModal() {
 
 function openEditModal(cake: any) {
   editingCake.value = { ...cake }; // clone cake so form won’t mutate directly
-  console.warn('Editing cake:', editingCake.value);
   isOpen.value = true;
 }
 
@@ -103,7 +104,10 @@ async function handleSubmit(cake: Cake) {
 </script>
 
 <template>
-  <div class="p-6 w-full flex flex-col">
+  <div v-if="auth.loading" class="flex justify-center">
+    <span class="loading loading-dots loading-xl" />
+  </div>
+  <div v-else class="p-6 w-full flex flex-col">
     <div class="flex flex-row justify-between">
       <p class="text-2xl font-bold">
         All Cakes

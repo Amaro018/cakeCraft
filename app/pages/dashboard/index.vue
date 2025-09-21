@@ -5,16 +5,14 @@ useHead({
 });
 
 definePageMeta({
-  middleware: ['auth'],
   layout: 'dashboard-layout',
+  middleware: ['auth'],
 });
 
 const { data: cakes } = await useFetch('/api/cakes');
 const { data: bakers } = await useFetch('/api/baker');
 const baker = computed(() => bakers.value?.data?.[0]);
 const cakesData = computed(() => (cakes.value as any)?.data ?? []);
-
-console.warn ('Cake data:', bakers.value);
 </script>
 
 <template>

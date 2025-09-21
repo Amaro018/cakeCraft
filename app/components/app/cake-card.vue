@@ -2,8 +2,6 @@
 const props = defineProps<{ cakes: any }>();
 const selectedCategory = ref<string>('all');
 
-console.warn('Cake data:', props.cakes?.data);
-
 const Categories = computed(() => [...new Set(props.cakes?.data.map((c: any) => c.cakes.cake_category))]);
 
 const filteredCakes = computed(() => {

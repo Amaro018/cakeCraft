@@ -2,11 +2,10 @@
 const { data: cakes } = await useFetch('/api/cakes');
 const { data: bakers } = await useFetch('/api/baker');
 const { data: userCount } = await useFetch('/api/users');
-console.warn('Cake data:', cakes.value);
 </script>
 
 <template>
-  <div class="hero max-w-screen p-10  flex flex-col ">
+  <div class="hero max-w-screen  flex flex-col">
     <div class="hero-content text-center max-w-md">
       <div class="max-w-md mx-auto">
         <div class="flex flex-col">
@@ -30,7 +29,7 @@ console.warn('Cake data:', cakes.value);
         </div>
       </div>
     </div>
-    <section class="p-10 min-w-full">
+    <section class="my-10">
       <AppCards
         :cakes="cakes"
         :bakers="bakers"
