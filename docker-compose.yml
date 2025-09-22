@@ -1,0 +1,11 @@
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "4500:4500"
+    volumes:
+      - ./public/uploads:/app/.output/public/uploads

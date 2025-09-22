@@ -31,4 +31,12 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
+  nitro: {
+    publicAssets: [
+      {
+        baseURL: '/uploads', // URL path
+        dir: 'public/uploads', // directory inside container
+      },
+    ],
+  },
 });
