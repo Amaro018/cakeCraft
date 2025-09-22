@@ -13,9 +13,9 @@ type BakerForm = {
 };
 
 const formData = ref<BakerForm>({
-  user_id: auth.user?.id,
+  user_id: auth.user?.id ?? '', // ✅ safe access
   baker_name: '',
-  baker_description: '',
+  baker_description: null,
   baker_address: '',
   baker_messenger_link: '',
 });
@@ -44,6 +44,7 @@ async function handleSubmit() {
     showMessage(res.message, false);
     isEditing.value = false;
     await refresh(); // re-fetch latest data
+    reloadNuxtApp();
   }
   catch (e) {
     const error = e as FetchError;

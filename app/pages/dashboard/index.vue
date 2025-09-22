@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const auth = useAuthStore();
+
 useHead({
   title: 'Cake Craft Dashboard',
 });
 
 definePageMeta({
   layout: 'dashboard-layout',
-  middleware: ['auth'],
 });
 
 const { data: cakes } = await useFetch('/api/cakes');

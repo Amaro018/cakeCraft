@@ -25,4 +25,9 @@ export const auth = betterAuth({
     },
   },
   allowedOrigin: env.BETTER_AUTH_URL,
+  cookies: {
+    secure: env.NODE_ENV === 'production', // must be false for local http
+    sameSite: 'lax', // or 'none' + secure true on HTTPS
+  },
+
 });

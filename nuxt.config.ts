@@ -1,5 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 
+import './server/lib/env';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
@@ -11,6 +13,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@pinia/nuxt',
   ],
+  plugins: ['~/plugins/init-auth.client', '~/plugins/init-auth.server'],
   pinia: {
     storesDirs: ['stores'], // or whatever folder you use for your stores
   },

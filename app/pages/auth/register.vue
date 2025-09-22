@@ -4,6 +4,8 @@ import type { FetchError } from 'ofetch';
 import { authClient } from '~~/shared/lib/auth-client';
 import { ref } from 'vue';
 
+const auth = useAuthStore();
+
 const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
 useHead({ title: 'Register - Cake Craft' });
@@ -29,8 +31,9 @@ async function register() {
       errorMessage.value = res.error.message || 'Something went wrong';
       return;
     }
-    showMessage('Successfully signed up', false);
     // redirect after successful signup
+    await auth.initAuth();
+    showMessage('Successfully signed up', false);
     await navigateTo('/dashboard');
   }
   catch (err: any) {

@@ -5,7 +5,6 @@ import { eq } from 'drizzle-orm';
 import { readMultipartFormData } from 'h3';
 import fs from 'node:fs';
 import path from 'node:path';
-import { z } from 'zod';
 
 export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession(event);
@@ -23,34 +22,47 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'No form data received' });
   }
 
-  // Parse form
   const parsedBody: Record<string, any> = {};
+  let uploadedImage: string | null = null;
+  let existingImage: string | null = null;
 
   for (const field of form) {
-    if (field.type === 'file' && field.data && field.filename) {
-    // 🟢 Handle image upload
+    if (field.filename) {
+      // ✅ New image uploaded
       const fileName = `${Date.now()}-${field.filename}`;
       const uploadPath = path.join(process.cwd(), 'public/uploads', fileName);
       fs.writeFileSync(uploadPath, field.data);
-      parsedBody.cake_image = fileName;
+      uploadedImage = fileName;
     }
     else if (field.name) {
-    // 🚫 Skip cake_image if it's coming as text
-      if (field.name === 'cake_image')
-        continue;
-      parsedBody[field.name] = field.data.toString();
+      const value = field.data.toString();
+      if (field.name === 'existing_image') {
+        existingImage = value; // fallback if no new file
+      }
+      else if (field.name !== 'cake_image') {
+        parsedBody[field.name] = value;
+      }
     }
   }
 
-  // ✅ Validate with update schema (all optional)
+  console.warn('susi🔑', uploadedImage, existingImage);
+
+  // 🔑 Determine which image to keep
+  if (uploadedImage) {
+    parsedBody.cake_image = uploadedImage;
+  }
+  else if (existingImage) {
+    parsedBody.cake_image = existingImage;
+  }
+
+  // ✅ Validate (all optional in update schema)
   const safeData = cakesUpdateSchema.parse(parsedBody);
 
-  // ✅ Update DB safely
   const updated = await db
     .update(cakes)
     .set({
       ...safeData,
-      updatedAt: new Date(), // ensure proper timestamp
+      updatedAt: new Date(),
     })
     .where(eq(cakes.id, id));
 

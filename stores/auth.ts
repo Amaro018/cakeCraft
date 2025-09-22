@@ -1,80 +1,3 @@
-// import { createAuthClient } from 'better-auth/vue';
-// // stores/auth.ts
-// import { defineStore } from 'pinia';
-
-// const authClient = createAuthClient();
-// interface User {
-//   id: string
-//   email: string
-//   name?: string
-//   image?: string | null
-//   // add other fields Better Auth returns if needed
-// }
-
-// export const useAuthStore = defineStore('auth', () => {
-//   const user = ref();
-//   const isLoggedIn = ref(false);
-//   const loading = ref(true);
-
-//   const initAuth = async () => {
-//     try {
-//       loading.value = true;
-//       const session = await authClient.getSession();
-
-//       if (session.data) {
-//         user.value = session.data.user;
-//         isLoggedIn.value = true;
-//       }
-//       else {
-//         user.value = null;
-//         isLoggedIn.value = false;
-//       }
-//     }
-//     catch (error) {
-//       console.error('Auth initialization error:', error);
-//       user.value = null;
-//       isLoggedIn.value = false;
-//     }
-//     finally {
-//       loading.value = false;
-//     }
-//   };
-
-//   const checkAuth = () => {
-//     return isLoggedIn.value;
-//   };
-
-//   // safely expose user and loading
-
-//   async function signIn() {
-//     await authClient.signIn.social({
-//       provider: 'google',
-//       callbackURL: '/dashboard',
-//     });
-//   }
-
-//   async function signOut() {
-//     try {
-//       await authClient.signOut();
-//       user.value = null;
-//       return navigateTo('/auth/login');
-//     }
-//     catch (error) {
-//       console.error('Sign-out failed:', error);
-//     }
-//   }
-
-//   return {
-//     user: readonly(user),
-//     isLoggedIn: readonly(isLoggedIn),
-//     loading,
-//     initAuth,
-//     checkAuth,
-//     signIn,
-//     signOut,
-//   };
-// });
-
 import { authClient } from '~~/shared/lib/auth-client';
 import { defineStore } from 'pinia';
 
@@ -83,44 +6,58 @@ type User = {
   email: string;
   name?: string;
   image?: string | null;
-  // add other fields Better Auth returns if needed
 };
+type GetSessionOptions = {
+  fetchOptions?: {
+    headers?: HeadersInit;
+  };
+};
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<User | null>(null);
+  const loading = ref(true);
 
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null as User | null,
-    loading: true,
-  }),
-  getters: {
-    isLoggedIn: state => !!state.user,
-  },
-  actions: {
-    async initAuth() {
-      this.loading = true;
-      try {
-        const session = await authClient.getSession();
-        this.user = session.data?.user ?? null;
-      }
-      catch (err) {
-        console.error('Error getting session:', err);
-        this.user = null;
-      }
-      finally {
-        this.loading = false;
-      }
-    },
+  const isLoggedIn = computed(() => !!user.value);
 
-    async signIn() {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: '/dashboard',
-      });
-    },
+  const initAuth = async (opts?: GetSessionOptions) => {
+    loading.value = true;
+    try {
+      const session = await authClient.getSession(opts);
+      user.value = session.data?.user ?? null;
+      console.warn('Session result', session.data);
+    }
+    catch (err) {
+      console.error('Error getting session:', err);
+      user.value = null;
+    }
+    finally {
+      loading.value = false;
+    }
+  };
+  const signIn = async () => {
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: '/dashboard',
+    });
+    await initAuth();
+  };
 
-    async signOut() {
+  const signOut = async () => {
+    try {
       await authClient.signOut();
-      this.user = null;
-      navigateTo('/');
-    },
-  },
+      user.value = null;
+      navigateTo('/auth/login');
+    }
+    catch (err) {
+      console.error('Error signing out:', err);
+    }
+  };
+
+  return {
+    user,
+    loading,
+    isLoggedIn,
+    initAuth,
+    signIn,
+    signOut,
+  };
 });

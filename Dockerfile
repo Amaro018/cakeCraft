@@ -9,6 +9,7 @@ RUN npm ci
 
 # Copy source and build
 COPY . .
+
 RUN npm run build
 
 # -------- PRODUCTION STAGE --------
@@ -18,10 +19,10 @@ WORKDIR /app
 
 # Copy built Nuxt output and node_modules
 COPY --from=build /app/.output ./.output
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
 
-EXPOSE 4000
+ENV PORT=4500
+
+EXPOSE 4500
 
 # Start Nuxt server
 CMD ["node", ".output/server/index.mjs"]

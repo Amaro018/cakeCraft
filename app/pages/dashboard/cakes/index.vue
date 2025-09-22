@@ -2,7 +2,15 @@
 import type { Cake } from '~~/server/lib/zod-schema';
 import type { FetchError } from 'ofetch';
 
-const auth = useAuthStore();
+definePageMeta({
+  layout: 'dashboard-layout',
+});
+
+useHead({
+  title: 'Cake Craft Cakes',
+});
+
+// const auth = useAuthStore();
 
 const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
@@ -22,15 +30,6 @@ const cakeData = ref<Cake>({
   cake_type: '',
   good_for: '',
   cake_image: null,
-});
-
-definePageMeta({
-  layout: 'dashboard-layout',
-  middleware: ['auth'],
-});
-
-useHead({
-  title: 'Cake Craft Cakes',
 });
 
 const isOpen = ref(false);
@@ -57,6 +56,10 @@ async function handleSubmit(cake: Cake) {
   // only append if a new file was uploaded
   if (cake.cake_image instanceof File) {
     payload.append('cake_image', cake.cake_image);
+  }
+  else if (editingCake.value?.cake_image) {
+  // 👇 Send the old image so the backend keeps it
+    payload.append('existing_image', editingCake.value.cake_image);
   }
 
   try {
@@ -104,10 +107,10 @@ async function handleSubmit(cake: Cake) {
 </script>
 
 <template>
-  <div v-if="auth.loading" class="flex justify-center">
+  <!-- <div v-if="auth.loading" class="flex justify-center">
     <span class="loading loading-dots loading-xl" />
-  </div>
-  <div v-else class="p-6 w-full flex flex-col">
+  </div> -->
+  <div class="p-6 w-full flex flex-col">
     <div class="flex flex-row justify-between">
       <p class="text-2xl font-bold">
         All Cakes
