@@ -1,10 +1,10 @@
 import db from '~~/server/db';
-import { cakes, cakesUpdateSchema } from '~~/server/db/schema/cake-schema';
+import { cakes } from '~~/server/db/schema/cake-schema';
 import { auth } from '~~/server/lib/auth';
+import cloudinary from '~~/server/lib/cloudinary';
 import { eq } from 'drizzle-orm';
-import { readMultipartFormData } from 'h3';
+import formidable from 'formidable';
 import fs from 'node:fs';
-import path from 'node:path';
 
 export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession(event);
@@ -13,60 +13,102 @@ export default defineEventHandler(async (event) => {
   }
 
   const id = Number(event.context.params?.id);
-  if (!id) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid ID' });
+  if (!id || Number.isNaN(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid Cake ID' });
   }
 
-  const form = await readMultipartFormData(event);
-  if (!form) {
-    throw createError({ statusCode: 400, statusMessage: 'No form data received' });
+  // ✅ Parse multipart form
+  const form = formidable({
+    multiples: false,
+    keepExtensions: true,
+  });
+  const [fields, files] = await form.parse(event.node.req);
+
+  const getField = (f: string | string[] | undefined): string | null =>
+    f ? (Array.isArray(f) ? f[0] : f) : null;
+
+  // Extract fields
+  const cake_name = getField(fields.cake_name);
+  const cake_description = getField(fields.cake_description);
+  const cake_price = getField(fields.cake_price);
+  const cake_category = getField(fields.cake_category);
+  const cake_flavor = getField(fields.cake_flavor);
+  const cake_size = getField(fields.cake_size);
+  const cake_topping = getField(fields.cake_topping);
+  const cake_type = getField(fields.cake_type);
+  const good_for = getField(fields.good_for);
+  const existing_image = getField(fields.existing_image);
+
+  // ✅ Get current cake to know the old image URL
+  const [currentCake] = await db.select().from(cakes).where(eq(cakes.id, id));
+  if (!currentCake) {
+    throw createError({ statusCode: 404, statusMessage: 'Cake not found' });
   }
 
-  const parsedBody: Record<string, any> = {};
-  let uploadedImage: string | null = null;
-  let existingImage: string | null = null;
+  // ✅ Handle optional image upload
+  let cloudinaryUrl: string | null = null;
+  const file = files.cake_image?.[0];
+  if (file) {
+    // Upload new image
+    const upload = await cloudinary.uploader.upload(file.filepath, {
+      folder: 'cake_craft/cakes',
+      use_filename: true,
+      unique_filename: false,
+      resource_type: 'image',
+    });
+    cloudinaryUrl = upload.secure_url;
+    fs.unlink(file.filepath, () => {});
 
-  for (const field of form) {
-    if (field.filename) {
-      // ✅ New image uploaded
-      const fileName = `${Date.now()}-${field.filename}`;
-      const uploadPath = path.join(process.cwd(), 'public/uploads', fileName);
-      fs.writeFileSync(uploadPath, field.data);
-      uploadedImage = fileName;
-    }
-    else if (field.name) {
-      const value = field.data.toString();
-      if (field.name === 'existing_image') {
-        existingImage = value; // fallback if no new file
+    // Delete old Cloudinary image if it exists
+    if (currentCake.cake_image?.includes('res.cloudinary.com')) {
+      const match = currentCake.cake_image.match(/cake_craft\/cakes\/([^/.]+)\.[a-z]+$/i);
+      if (match?.[1]) {
+        const publicId = `cake_craft/cakes/${match[1]}`;
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
-      else if (field.name !== 'cake_image') {
-        parsedBody[field.name] = value;
-      }
     }
   }
 
-  // 🔑 Determine which image to keep
-  if (uploadedImage) {
-    parsedBody.cake_image = uploadedImage;
+  // ✅ Prepare update object
+  const updateData: Record<string, any> = {};
+  if (cake_name !== null)
+    updateData.cake_name = cake_name;
+  if (cake_description !== null)
+    updateData.cake_description = cake_description;
+  if (cake_price !== null)
+    updateData.cake_price = cake_price;
+  if (cake_category !== null)
+    updateData.cake_category = cake_category;
+  if (cake_flavor !== null)
+    updateData.cake_flavor = cake_flavor;
+  if (cake_size !== null)
+    updateData.cake_size = cake_size;
+  if (cake_topping !== null)
+    updateData.cake_topping = cake_topping;
+  if (cake_type !== null)
+    updateData.cake_type = cake_type;
+  if (good_for !== null)
+    updateData.good_for = good_for;
+
+  // Decide which image to save
+  if (cloudinaryUrl) {
+    updateData.cake_image = cloudinaryUrl;
   }
-  else if (existingImage) {
-    parsedBody.cake_image = existingImage;
+  else if (existing_image) {
+    updateData.cake_image = existing_image;
   }
 
-  // ✅ Validate (all optional in update schema)
-  const safeData = cakesUpdateSchema.parse(parsedBody);
+  updateData.updatedAt = new Date();
 
+  // ✅ Update DB
   const updated = await db
     .update(cakes)
-    .set({
-      ...safeData,
-      updatedAt: new Date(),
-    })
+    .set(updateData)
     .where(eq(cakes.id, id));
 
   return {
     success: true,
-    cake: updated,
+    data: updated,
     message: 'Cake updated successfully',
   };
 });

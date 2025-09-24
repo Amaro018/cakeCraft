@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer sm:footer-horizontal bg-base-300 text-neutral-content p-10 flex flex-row justify-between items-center">
+  <footer class="footer bg-base-100 shadow-md sm:footer-horizontal px-10 py-2 flex flex-row justify-between items-center mt-2">
     <aside class="flex flex-row gap-4">
       <Icon name="game-icons:chef-toque" size="3em" />
       <p>

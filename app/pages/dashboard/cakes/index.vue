@@ -14,10 +14,11 @@ useHead({
 
 const { isMessage, isError, responseMessage, showMessage } = useNotifications();
 
-const { data: cakes, refresh } = await useFetch('/api/cakes');
+const { data: cakes, refresh, pending } = await useFetch('/api/cakes');
 const userCakes = computed(() => cakes.value || []);
 const cakeFormRef = ref();
 const editingCake = ref();
+const isSubmitting = ref(false);
 
 const cakeData = ref<Cake>({
   cake_name: '',
@@ -43,74 +44,63 @@ function openEditModal(cake: any) {
   editingCake.value = { ...cake }; // clone cake so form won’t mutate directly
   isOpen.value = true;
 }
-
 async function handleSubmit(cake: Cake) {
+  isSubmitting.value = true;
   const payload = new FormData();
-
   for (const [key, value] of Object.entries(cake)) {
-    if (value !== null && key !== 'cake_image') {
+    if (value !== null && key !== 'cake_image')
       payload.append(key, value as any);
-    }
   }
-
-  // only append if a new file was uploaded
   if (cake.cake_image instanceof File) {
     payload.append('cake_image', cake.cake_image);
   }
   else if (editingCake.value?.cake_image) {
-  // 👇 Send the old image so the backend keeps it
     payload.append('existing_image', editingCake.value.cake_image);
   }
 
   try {
     if (editingCake.value?.id) {
-      // 🟢 EDIT mode
-      const res = await $fetch(`/api/cakes/${editingCake.value.id}`, {
-        method: 'PUT',
-        body: payload,
-      });
+      const res = await $fetch(`/api/cakes/${editingCake.value.id}`, { method: 'PUT', body: payload });
       showMessage(res.message, false);
     }
     else {
-      // 🟢 CREATE mode
-      const res = await $fetch('/api/cakes', {
-        method: 'POST',
-        body: payload,
-      });
+      const res = await $fetch('/api/cakes', { method: 'POST', body: payload });
       showMessage(res.message, false);
     }
-
-    await refresh(); // refresh list after create/update
-
-    // ✅ reset form + close modal
-    cakeFormRef.value?.resetForm();
-    cakeData.value = {
-      cake_name: '',
-      cake_description: '',
-      cake_price: 0,
-      cake_category: '',
-      cake_flavor: '',
-      cake_size: '',
-      cake_topping: '',
-      cake_type: '',
-      good_for: '',
-      cake_image: null,
-    };
-    isOpen.value = false;
-    editingCake.value = null;
+    await refresh();
   }
   catch (e) {
     const error = e as FetchError;
     showMessage(error.data.message || 'An unexpected error occurred.', true);
   }
+  finally {
+    isSubmitting.value = false; // ✅ end loading
+  }
+
+  // ✅ Only reset AFTER submitting is finished
+  cakeFormRef.value?.resetForm();
+  cakeData.value = {
+    cake_name: '',
+    cake_description: '',
+    cake_price: 0,
+    cake_category: '',
+    cake_flavor: '',
+    cake_size: '',
+    cake_topping: '',
+    cake_type: '',
+    good_for: '',
+    cake_image: null,
+  };
+  isOpen.value = false;
+  editingCake.value = null;
 }
 </script>
 
 <template>
-  <!-- <div v-if="auth.loading" class="flex justify-center">
+  <div v-if="pending" class="flex justify-center">
     <span class="loading loading-dots loading-xl" />
-  </div> -->
-  <div class="p-6 w-full flex flex-col">
+  </div>
+  <div v-else class="p-6 w-full flex flex-col">
     <div class="flex flex-row justify-between">
       <p class="text-2xl font-bold">
         All Cakes
@@ -129,7 +119,7 @@ async function handleSubmit(cake: Cake) {
       <div class="modal-box w-11/12 max-w-5xl">
         <CakesCakeForm
           ref="cakeFormRef"
-
+          v-model:is-submitting="isSubmitting"
           :cake="editingCake || {
             cake_name: '',
             cake_description: '',
@@ -144,7 +134,6 @@ async function handleSubmit(cake: Cake) {
           }"
           @show-modal="() => {
             isOpen = false;
-            cakeFormRef?.resetForm(); // ✅ clears image + localCake
           }"
           @submit="handleSubmit"
         />

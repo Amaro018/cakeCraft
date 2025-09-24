@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'dashboard-layout',
 });
 
-const { data: cakes } = await useFetch('/api/cakes');
+const { data: cakes, pending } = await useFetch('/api/cakes');
 const { data: bakers } = await useFetch('/api/baker');
 const baker = computed(() => bakers.value?.data?.[0]);
 const cakesData = computed(() => (cakes.value as any)?.data ?? []);
@@ -17,7 +17,10 @@ const cakesData = computed(() => (cakes.value as any)?.data ?? []);
 
 <template>
   <!-- Page Content -->
-  <div class="w-full">
+  <div v-if="pending" class="flex justify-center">
+    <span class="loading loading-dots loading-xl" />
+  </div>
+  <div v-else class="w-full">
     <client-only>
       <main class="p-4 sm:p-6 lg:p-8 w-full">
         <div v-if="auth.loading" class="flex justify-center">

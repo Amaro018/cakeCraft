@@ -3,10 +3,12 @@ import type { Cake } from '~~/server/lib/zod-schema';
 
 const props = defineProps<{
   cake: Cake;
+  isSubmitting: boolean;
 }>();
 const emit = defineEmits<{
   (e: 'showModal'): void;
   (e: 'submit', formData: Cake): void;
+  (e: 'update:isSubmitting', value: boolean): void; // ✅ Emit updates
 }>();
 
 defineExpose({ resetForm });
@@ -16,10 +18,18 @@ const imageFile = ref<File | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const localCake = ref(props.cake);
+const isSubmittingLocal = ref(props.isSubmitting);
 
-watch(() => props.cake, (newVal) => {
-  localCake.value = newVal;
-});
+watch(
+  () => props.cake,
+  (newVal) => {
+    // Only update when NOT submitting
+    if (!props.isSubmitting && !isSubmittingLocal.value) {
+      localCake.value = { ...newVal };
+      imageUrl.value = newVal.cake_image ? `${newVal.cake_image}` : null;
+    }
+  },
+);
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -58,20 +68,20 @@ function resetForm() {
 }
 
 function handleSubmit() {
-  // Ensure user_id is set before emitting
+  emit('update:isSubmitting', true);
   emit('submit', { ...localCake.value });
 }
 
-watch(() => props.cake, (newVal) => {
-  localCake.value = { ...newVal };
-  // if editing existing cake with image
-  if (newVal.cake_image) {
-    imageUrl.value = `/uploads/${newVal.cake_image}`;
-  }
-  else {
-    imageUrl.value = null;
-  }
-});
+// watch(() => props.cake, (newVal) => {
+//   localCake.value = { ...newVal };
+//   // if editing existing cake with image
+//   if (newVal.cake_image) {
+//     imageUrl.value = `${newVal.cake_image}`;
+//   }
+//   else {
+//     imageUrl.value = null;
+//   }
+// });
 </script>
 
 <template>
@@ -119,14 +129,22 @@ watch(() => props.cake, (newVal) => {
             </fieldset>
             <fieldset class="fieldset w-full">
               <legend>Category</legend>
-              <input
+              <select
                 v-model="localCake.cake_category"
-                type="text"
-                placeholder="Birthday, Wedding, Anniversary"
-                class="input"
+                class="select select-bordered w-full"
                 required
               >
+                <option disabled value="">
+                  Select a category
+                </option>
+                <option>Birthday</option>
+                <option>Wedding</option>
+                <option>Anniversary</option>
+                <option>Graduation</option>
+                <option>Others</option>
+              </select>
             </fieldset>
+
             <fieldset class="fieldset w-full">
               <legend>Cake Flavor</legend>
               <input
@@ -193,8 +211,12 @@ watch(() => props.cake, (newVal) => {
           >
             Close
           </button>
-          <button class="btn btn-primary" type="submit">
-            Submit
+          <button
+            class="btn btn-primary"
+            type="submit"
+            :disabled="props.isSubmitting"
+          >
+            {{ props.isSubmitting ? 'Submitting...' : 'Submit' }}
           </button>
         </div>
       </form>
