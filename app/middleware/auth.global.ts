@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/auth/login');
   }
 
-  if (auth.isLoggedIn && to.path === '/auth/login') {
+  if (auth.isLoggedIn && publicPages.includes(to.path)) {
     return navigateTo('/dashboard');
   }
 });

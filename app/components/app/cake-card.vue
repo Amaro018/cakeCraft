@@ -1,30 +1,39 @@
 <script setup lang="ts">
 const props = defineProps<{ cakes: any }>();
 const selectedCategory = ref<string>('all');
+const sortOrder = ref<'asc' | 'desc' | 'none'>('none');
 
-const Categories = computed(() => [...new Set(props.cakes?.data.map((c: any) => c.cakes.cake_category))]);
+const Categories = computed(() => {
+  if (!props.cakes?.data)
+    return [];
+  return [...new Set(
+    props.cakes.data
+      .map((c: any) => c.cakes?.cake_category) // ✅ optional chaining
+      .filter((cat: string | undefined) => !!cat), // ✅ remove null/undefined
+  )];
+});
 
 const filteredCakes = computed(() => {
   let filtered = [...(props.cakes?.data ?? [])];
 
-  // Category filter
   if (selectedCategory.value !== 'all') {
     filtered = filtered.filter(
-      cake => cake.cakes.cake_category === selectedCategory.value,
+      cake => cake.cakes?.cake_category === selectedCategory.value, // ✅ optional chaining
     );
   }
 
-  // // Sorting by price
-  // if (sortOrder.value === 'asc') {
-  //   filtered.sort(
-  //     (a, b) => Number.parseFloat(a.cakes.cake_price) - Number.parseFloat(b.cakes.cake_price),
-  //   );
-  // }
-  // else if (sortOrder.value === 'desc') {
-  //   filtered.sort(
-  //     (a, b) => Number.parseFloat(b.cakes.cake_price) - Number.parseFloat(a.cakes.cake_price),
-  //   );
-  // }
+  if (sortOrder.value === 'asc') {
+    filtered.sort((a, b) =>
+      Number.parseFloat(a.cakes?.cake_price ?? 0)
+      - Number.parseFloat(b.cakes?.cake_price ?? 0),
+    );
+  }
+  else if (sortOrder.value === 'desc') {
+    filtered.sort((a, b) =>
+      Number.parseFloat(b.cakes?.cake_price ?? 0)
+      - Number.parseFloat(a.cakes?.cake_price ?? 0),
+    );
+  }
 
   return filtered;
 });
@@ -51,7 +60,7 @@ function goToPage(page: number) {
 
 <template>
   <main>
-    <div class="flex flex-row justify-end">
+    <div class="flex flex-row justify-end gap-2">
       <!-- Category Filter -->
       <select
         v-model="selectedCategory"
@@ -68,13 +77,26 @@ function goToPage(page: number) {
           {{ cat }}
         </option>
       </select>
+
+      <!-- 🔹 Sort Filter -->
+      <select v-model="sortOrder" class="select select-bordered">
+        <option value="none">
+          Sort by Price
+        </option>
+        <option value="asc">
+          Price: Low to High
+        </option>
+        <option value="desc">
+          Price: High to Low
+        </option>
+      </select>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       <div v-for="cake in paginatedCakes" :key="cake.id">
         <div class="card card-compact shadow-sm">
           <figure class="relative">
             <img
-              :src="`/uploads/${cake.cakes.cake_image}`"
+              :src="cake.cakes.cake_image"
               alt="Cake image"
               class="w-full h-48 object-cover"
             >

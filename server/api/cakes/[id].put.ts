@@ -45,8 +45,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  console.warn('susi🔑', uploadedImage, existingImage);
-
   // 🔑 Determine which image to keep
   if (uploadedImage) {
     parsedBody.cake_image = uploadedImage;

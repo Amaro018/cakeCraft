@@ -39,5 +39,6 @@ const { data: userCount } = await useFetch('/api/users');
     <div>
       <AppCakeCard :cakes="cakes" />
     </div>
+    <AppFooter />
   </div>
 </template>

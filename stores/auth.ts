@@ -23,7 +23,6 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const session = await authClient.getSession(opts);
       user.value = session.data?.user ?? null;
-      console.warn('Session result', session.data);
     }
     catch (err) {
       console.error('Error getting session:', err);

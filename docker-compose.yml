@@ -7,5 +7,3 @@ services:
       - .env
     ports:
       - "4500:4500"
-    volumes:
-      - ./public/uploads:/app/.output/public/uploads

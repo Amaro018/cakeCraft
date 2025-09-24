@@ -1,33 +1,28 @@
 import db from '~~/server/db';
 import { cakes } from '~~/server/db/schema/cake-schema';
 import { auth } from '~~/server/lib/auth';
+import cloudinary from '~~/server/lib/cloudinary';
+import env from '~~/server/lib/env';
 import formidable from 'formidable';
+import fs from 'node:fs';
 import { join } from 'node:path';
 
 export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession(event);
   if (!session?.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    });
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
+
   const form = formidable({
     multiples: false,
-    uploadDir: join(process.cwd(), 'public/uploads'),
-    keepExtensions: true,
+    keepExtensions: true, // keep original extension
   });
 
   const [fields, files] = await form.parse(event.node.req);
 
-  // helper to safely extract first value
-  const getField = (f: string | string[] | undefined): string | null => {
-    if (!f)
-      return null;
-    return Array.isArray(f) ? f[0] : f;
-  };
+  const getField = (f: string | string[] | undefined): string | null =>
+    f ? (Array.isArray(f) ? f[0] : f) : null;
 
-  // destructure & normalize
   const cake_name = getField(fields.cake_name)!;
   const cake_description = getField(fields.cake_description);
   const cake_price = getField(fields.cake_price)!;
@@ -38,14 +33,23 @@ export default defineEventHandler(async (event) => {
   const cake_type = getField(fields.cake_type)!;
   const good_for = getField(fields.good_for)!;
 
-  // handle file
-  let filePath: string | null = null;
+  // ✅ Upload to Cloudinary
+  let cloudinaryUrl: string | null = null;
   const file = files.cake_image?.[0];
   if (file) {
-    filePath = `${file.newFilename}`;
+    const upload = await cloudinary.uploader.upload(file.filepath, {
+      folder: 'cake_craft/cakes', // optional folder in Cloudinary
+      use_filename: true,
+      unique_filename: false,
+      resource_type: 'image',
+    });
+    cloudinaryUrl = upload.secure_url;
+
+    // (Optional) Clean up temp file
+    fs.unlink(file.filepath, () => {});
   }
 
-  // insert into DB (fields now are plain strings, not arrays)
+  // ✅ Insert into DB
   const [createdCake] = await db
     .insert(cakes)
     .values({
@@ -59,7 +63,7 @@ export default defineEventHandler(async (event) => {
       cake_topping,
       cake_type,
       good_for,
-      cake_image: filePath ?? '',
+      cake_image: cloudinaryUrl ?? '', // store Cloudinary URL
     })
     .$returningId();
 

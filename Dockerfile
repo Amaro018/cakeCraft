@@ -18,14 +18,14 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-# Copy built Nuxt output and node_modules
+# Copy Nuxt build output
 COPY --from=build /app/.output ./.output
 
-RUN mkdir -p /app/.output/public/uploads
+
 
 ENV PORT=4500
-
 EXPOSE 4500
 
 # Start Nuxt server
 CMD ["node", ".output/server/index.mjs"]
+

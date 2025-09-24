@@ -9,7 +9,7 @@ defineEmits(['edit', 'delete']);
       <div class="card card-compact shadow-sm">
         <figure class="relative">
           <img
-            :src="`/uploads/${cake.cake_image}`"
+            :src="cake.cake_image"
             alt="Cake image"
             class="w-full h-48 object-cover"
           >
