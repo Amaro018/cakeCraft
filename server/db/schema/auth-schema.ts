@@ -1,7 +1,7 @@
 import {
-  blob,
+
   integer,
-  primaryKey,
+
   sqliteTable,
   text,
 } from 'drizzle-orm/sqlite-core';

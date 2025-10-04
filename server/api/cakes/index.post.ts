@@ -2,10 +2,8 @@ import db from '~~/server/db';
 import { cakes } from '~~/server/db/schema/cake-schema'; // Adapted for sqlite-core
 import { auth } from '~~/server/lib/auth';
 import cloudinary from '~~/server/lib/cloudinary';
-import env from '~~/server/lib/env';
 import formidable from 'formidable';
 import fs from 'node:fs';
-import { join } from 'node:path';
 
 export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession(event);
