@@ -140,7 +140,12 @@ async function handleSubmit(cake: Cake) {
       </div>
       <!-- Cake grid -->
     </dialog>
-    <div>
+    <div v-if="!cakes?.data?.length" class="flex justify-center my-10">
+      <p class="text-2xl font-bold">
+        No cake found
+      </p>
+    </div>
+    <div v-else>
       <CakesCakeCard
         :cakes="userCakes"
         @edit="openEditModal"

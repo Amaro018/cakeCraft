@@ -1,33 +1,12 @@
 {
   "version": "7",
-  "dialect": "mysql",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1757579688749,
-      "tag": "0000_tranquil_rachel_grey",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1758046402249,
-      "tag": "0001_glossy_devos",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1758046430588,
-      "tag": "0002_woozy_the_fallen",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1758215590997,
-      "tag": "0003_brown_havok",
+      "version": "6",
+      "when": 1759566739382,
+      "tag": "0000_curved_blue_marvel",
       "breakpoints": true
     }
   ]

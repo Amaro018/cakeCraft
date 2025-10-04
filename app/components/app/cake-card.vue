@@ -98,7 +98,7 @@ function goToPage(page: number) {
             <img
               :src="cake.cakes.cake_image"
               alt="Cake image"
-              class="w-full h-48 object-cover"
+              class="w-full h-48 object-contain"
             >
             <div>
               <span class="btn-gradient font-bold absolute top-2 right-2 text-xs px-2">

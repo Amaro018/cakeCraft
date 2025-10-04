@@ -36,7 +36,10 @@ const { data: userCount } = await useFetch('/api/users');
         :user-count="userCount"
       />
     </section>
-    <div>
+    <div v-if="!cakes || cakes.data.length === 0" class="flex flex-col justify-center items-center gap-4 min-h-screen">
+      <p>No cakes found</p>
+    </div>
+    <div v-else>
       <AppCakeCard :cakes="cakes" />
     </div>
     <AppFooter />

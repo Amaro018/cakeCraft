@@ -12,6 +12,8 @@ const EnvSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_API_KEY: z.string(),
   CLOUDINARY_API_SECRET: z.string(),
+  TURSO_DB_URL: z.string(),
+  TURSO_DB_TOKEN: z.string(),
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;

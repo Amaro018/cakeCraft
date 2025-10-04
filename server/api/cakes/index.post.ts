@@ -1,5 +1,5 @@
 import db from '~~/server/db';
-import { cakes } from '~~/server/db/schema/cake-schema';
+import { cakes } from '~~/server/db/schema/cake-schema'; // Adapted for sqlite-core
 import { auth } from '~~/server/lib/auth';
 import cloudinary from '~~/server/lib/cloudinary';
 import env from '~~/server/lib/env';
@@ -49,8 +49,8 @@ export default defineEventHandler(async (event) => {
     fs.unlink(file.filepath, () => {});
   }
 
-  // ✅ Insert into DB
-  const [createdCake] = await db
+  // ✅ Insert into DB (SQLite with drizzle-orm)
+  const result = await db
     .insert(cakes)
     .values({
       user_id: session.user.id,
@@ -64,12 +64,14 @@ export default defineEventHandler(async (event) => {
       cake_type,
       good_for,
       cake_image: cloudinaryUrl ?? '', // store Cloudinary URL
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     })
-    .$returningId();
+    .run();
 
   return {
     success: true,
-    data: createdCake,
+    data: result,
     message: 'Cake created successfully',
   };
 });

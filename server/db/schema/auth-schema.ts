@@ -1,67 +1,61 @@
 import {
-  boolean,
-  mysqlTable,
+  blob,
+  integer,
+  primaryKey,
+  sqliteTable,
   text,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/mysql-core';
+} from 'drizzle-orm/sqlite-core';
 
-export const user = mysqlTable('user', {
-  id: varchar('id', { length: 36 }).primaryKey(),
+// USER TABLE
+export const user = sqliteTable('user', {
+  id: text('id').primaryKey(),
   name: text('name').notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  emailVerified: boolean('email_verified')
-    .$defaultFn(() => false)
-    .notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: integer('email_verified').$defaultFn(() => 0).notNull(), // 0 (false), 1 (true)
   image: text('image'),
-  createdAt: timestamp('created_at')
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp('updated_at')
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
+  createdAt: integer('created_at').$defaultFn(() => Date.now()).notNull(), // store as unix timestamp or ISO string
+  updatedAt: integer('updated_at').$defaultFn(() => Date.now()).notNull(),
 });
 
-export const session = mysqlTable('session', {
-  id: varchar('id', { length: 36 }).primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
-  token: varchar('token', { length: 255 }).notNull().unique(),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
+// SESSION TABLE
+export const session = sqliteTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: integer('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  userId: varchar('user_id', { length: 36 })
+  userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
 });
 
-export const account = mysqlTable('account', {
-  id: varchar('id', { length: 36 }).primaryKey(),
+// ACCOUNT TABLE
+export const account = sqliteTable('account', {
+  id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
-  userId: varchar('user_id', { length: 36 })
+  userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
-  accessTokenExpiresAt: timestamp('access_token_expires_at'),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  accessTokenExpiresAt: integer('access_token_expires_at'),
+  refreshTokenExpiresAt: integer('refresh_token_expires_at'),
   scope: text('scope'),
   password: text('password'),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
 });
 
-export const verification = mysqlTable('verification', {
-  id: varchar('id', { length: 36 }).primaryKey(),
+// VERIFICATION TABLE
+export const verification = sqliteTable('verification', {
+  id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').$defaultFn(
-    () => /* @__PURE__ */ new Date(),
-  ),
-  updatedAt: timestamp('updated_at').$defaultFn(
-    () => /* @__PURE__ */ new Date(),
-  ),
+  expiresAt: integer('expires_at').notNull(),
+  createdAt: integer('created_at').$defaultFn(() => Date.now()),
+  updatedAt: integer('updated_at').$defaultFn(() => Date.now()),
 });

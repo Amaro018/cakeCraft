@@ -1,22 +1,21 @@
-import { int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
-const cakes = mysqlTable('cakes', {
-  id: int('id').autoincrement().primaryKey(),
-  user_id: varchar('user_id', { length: 36 }).notNull(),
-  cake_name: varchar('cake_name', { length: 255 }).notNull(),
-  cake_description: varchar('cake_description', { length: 255 }),
-  cake_price: varchar('cake_price', { length: 255 }).notNull(),
-  cake_category: varchar('cake_category', { length: 255 }).notNull(),
-  cake_flavor: varchar('cake_flavor', { length: 255 }).notNull(),
-  cake_size: varchar('cake_size', { length: 255 }).notNull(),
-  cake_topping: varchar('cake_topping', { length: 255 }).notNull(),
-  cake_type: varchar('cake_type', { length: 255 }).notNull(),
-  good_for: varchar('good_for', { length: 255 }).notNull(),
-  cake_image: varchar('cake_image', { length: 255 }).notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt').onUpdateNow().defaultNow(), // 👈 new
+const cakes = sqliteTable('cakes', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: text('user_id').notNull(),
+  cake_name: text('cake_name').notNull(),
+  cake_description: text('cake_description'),
+  cake_price: text('cake_price').notNull(),
+  cake_category: text('cake_category').notNull(),
+  cake_flavor: text('cake_flavor').notNull(),
+  cake_size: text('cake_size').notNull(),
+  cake_topping: text('cake_topping').notNull(),
+  cake_type: text('cake_type').notNull(),
+  good_for: text('good_for').notNull(),
+  cake_image: text('cake_image').notNull(),
+  createdAt: integer('createdAt').$defaultFn(() => Date.now()), // store as Unix timestamp (ms)
+  updatedAt: integer('updatedAt').$defaultFn(() => Date.now()), // update with logic if needed
 });
 
 // ✅ Insert schema
