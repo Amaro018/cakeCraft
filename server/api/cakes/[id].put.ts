@@ -57,7 +57,9 @@ export default defineEventHandler(async (event) => {
       resource_type: 'image',
     });
     cloudinaryUrl = upload.secure_url;
-    fs.unlink(file.filepath, () => {});
+    fs.unlink(file.filepath, () => {
+      console.warn('Deleted temp file:', file.filepath);
+    });
 
     // Delete old Cloudinary image if it exists
     if (currentCake.cake_image?.includes('res.cloudinary.com')) {
