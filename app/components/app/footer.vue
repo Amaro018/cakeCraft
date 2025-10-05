@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer bg-base-200 shadow-amber-600 sm:footer-horizontal flex flex-row justify-between px-10 py-4  mt-2">
+  <footer class="footer bg-base-200 shadow-amber-600 sm:footer-horizontal flex flex-row justify-between px-10 py-4  mt-2 items-center">
     <aside class="flex flex-row gap-4">
       <Icon name="game-icons:chef-toque" size="3em" />
       <p>
@@ -25,6 +25,14 @@
             name="lucide:facebook"
             size="2em"
             class="hover:text-blue-600"
+          />
+        </a>
+
+        <a target="_blank" href="https://retro-portfolio-gamma.vercel.app/">
+          <Icon
+            name="lucide:circle-user-round"
+            size="2em"
+            class="hover:text-amber-600"
           />
         </a>
       </div>

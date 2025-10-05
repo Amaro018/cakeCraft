@@ -20,12 +20,17 @@ const { data: userCount } = await useFetch('/api/users');
           Connect with talented local bakers and find the perfect cake for any occasion. From birthdays to weddings, we have something special for everyone.
         </p>
         <div class="flex flex-col gap-4 justify-center md:flex-row">
-          <button class="btn bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-3 text-lg">
-            <Icon name="lucide:search" size="1em" />Browse Cakes
-          </button>
-          <button class="btn border-amber-300  hover:bg-amber-100 px-8 py-3 text-lg w-full sm:w-auto">
-            <Icon name="lucide:chef-hat" size="1em" />Start Selling
-          </button>
+          <a href="#index-cakes">
+
+            <button class="btn bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-3 text-lg">
+              <Icon name="lucide:search" size="1em" />Browse Cakes
+            </button>
+          </a>
+          <NuxtLink to="/auth/login">
+            <button class="btn border-amber-300  hover:bg-amber-100 px-8 py-3 text-lg w-full sm:w-auto hover:text-amber-600">
+              <Icon name="lucide:chef-hat" size="1em" />Start Selling
+            </button>
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -40,7 +45,7 @@ const { data: userCount } = await useFetch('/api/users');
       <p>No cakes found</p>
     </div>
     <div v-else>
-      <AppCakeCard :cakes="cakes" />
+      <AppCakeCard id="index-cakes" :cakes="cakes" />
     </div>
     <AppFooter />
   </div>
